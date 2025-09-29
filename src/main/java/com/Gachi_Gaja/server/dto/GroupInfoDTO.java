@@ -1,7 +1,9 @@
 package com.Gachi_Gaja.server.dto;
 
+import java.util.UUID;
+
 public record GroupInfoDTO(
-        String groupId,
+        UUID groupId,
         String title,
         String region,
         String period,

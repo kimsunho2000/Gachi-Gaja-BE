@@ -1,7 +1,9 @@
 package com.Gachi_Gaja.server.dto;
 
+import java.util.UUID;
+
 public record CafeInfoDTO(
-        String cafeId,
+        UUID cafeId,
         String name,
         String location,
         String info

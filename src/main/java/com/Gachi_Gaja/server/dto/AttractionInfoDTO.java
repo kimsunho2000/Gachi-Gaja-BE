@@ -1,7 +1,9 @@
 package com.Gachi_Gaja.server.dto;
 
+import java.util.UUID;
+
 public record AttractionInfoDTO(
-        String attractionId,
+        UUID attractionId,
         String name,
         String region,
         String location,
