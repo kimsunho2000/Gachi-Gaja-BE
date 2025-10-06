@@ -11,6 +11,7 @@ description = 'Demo project for Spring Boot'
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
+		// languageVersion = JavaLanguageVersion.of(17) 	// 21 버전이 없어 수정
 	}
 }
 
@@ -33,6 +34,9 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+	// Gemini 연동
+	implementation 'com.google.genai:google-genai:1.0.0'
 }
 
 tasks.named('test') {
