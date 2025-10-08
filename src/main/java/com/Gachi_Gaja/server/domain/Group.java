@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "groups") // 복수형으로 변경
+@Table(name = "groups")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Group {
@@ -43,10 +43,10 @@ public class Group {
     @Column(nullable = false)
     private int budget;
 
-    @Column(name = "requirement_deadline") // 더 명확한 컬럼명
+    @Column(name = "requirement_deadline")
     private LocalDate requirementDeadline;
 
-    @Column(name = "vote_deadline") // 더 명확한 컬럼명
+    @Column(name = "vote_deadline")
     private LocalDate voteDeadline;
 
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)

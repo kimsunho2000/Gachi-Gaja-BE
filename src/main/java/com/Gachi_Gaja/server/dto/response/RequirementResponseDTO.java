@@ -3,9 +3,11 @@ package com.Gachi_Gaja.server.dto.response;
 import com.Gachi_Gaja.server.dto.AttractionInfoDTO;
 import com.Gachi_Gaja.server.dto.CafeInfoDTO;
 import com.Gachi_Gaja.server.dto.RestaurantInfoDTO;
+import lombok.Builder;
 
 import java.util.List;
 
+@Builder
 public record RequirementResponseDTO(
         String style,
         String Schedule,
