@@ -33,9 +33,6 @@ public class Cafe {
     @Column
     private String info;
 
-    @ManyToMany(mappedBy = "cafes",fetch = FetchType.LAZY)
-    private List<Requirement> requirements = new ArrayList<>();
-
     @Builder
     public Cafe(String name, String region, String location, String info) {
         this.name = name;
