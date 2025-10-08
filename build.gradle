@@ -37,6 +37,11 @@ dependencies {
 
 	// Gemini 연동
 	implementation 'com.google.genai:google-genai:1.0.0'
+
+	//---로그인 및 회원관리를 위해 추가---
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// JWT (나중에 쓸 예정)
 }
 
 tasks.named('test') {

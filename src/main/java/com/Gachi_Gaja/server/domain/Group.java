@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name = "groups")
+@Table(name = "`groups`") // 복수형으로 변경 - 이것도 에러가 나서 백틱 추가해 수정
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Group {
