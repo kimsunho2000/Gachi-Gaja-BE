@@ -27,12 +27,23 @@ public class User {
     @Column(nullable = false)
     private String password;
 
+    @Column(name = "nickname", length = 50)
+    private String nickname;
+
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Member> members = new ArrayList<>();
 
     @Builder
-    public User(String email, String password) {
+    public User(String email, String password, String nickname) {
         this.email = email;
         this.password = password;
+        this.nickname = nickname;
     }
+
+    public void update(String password, String nickname) {
+        if (password != null) this.password = password;
+        if (nickname != null) this.nickname = nickname;
+    }
+
+    public void setEmail(String email) { this.email = email; }
 }
