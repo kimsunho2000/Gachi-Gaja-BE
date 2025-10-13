@@ -53,37 +53,44 @@ public class Requirement {
     @Column(name = "plus_requirement")
     private String plusRequirement;
 
-    @ManyToMany
-    @JoinTable(
-            name = "requirement_restaurant",
-            joinColumns = @JoinColumn(name = "requirement_id"),
-            inverseJoinColumns = @JoinColumn(name = "restaurant_id")
-    )
-    private List<Restaurant> restaurants = new ArrayList<>();
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "restaurant_uuid", joinColumns = @JoinColumn(name = "requirement_id"))
+    @Column(name = "restaurant_uuid", nullable = false)
+    private List<UUID> restaurants = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "requirement_attraction",
-            joinColumns = @JoinColumn(name = "requirement_id"),
-            inverseJoinColumns = @JoinColumn(name = "attraction_id")
-    )
-    private List<Attraction> attractions = new ArrayList<>();
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "attraction_uuid", joinColumns = @JoinColumn(name = "requirement_id"))
+    @Column(name = "attraction_uuid", nullable = false)
+    private List<UUID> attractions = new ArrayList<>();
 
-    @ManyToMany
-    @JoinTable(
-            name = "requirement_cafe",
-            joinColumns = @JoinColumn(name = "requirement_id"),
-            inverseJoinColumns = @JoinColumn(name = "cafe_id")
-    )
-    private List<Cafe> cafes = new ArrayList<>();
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name = "cafe_uuid", joinColumns = @JoinColumn(name = "requirement_id"))
+    @Column(name = "cafe_uuid", nullable = false)
+    private List<UUID> cafes = new ArrayList<>();
 
     @Builder
     public Requirement(Group group, User user, String style, String schedule,
                       String lodgingCriteria, String lodgingType, String mealBudget,
                       String eatingHabit, String distance, String plusRequirement,
-                      List<Restaurant> restaurants, List<Attraction> attractions, List<Cafe> cafes) {
+                      List<UUID> restaurants, List<UUID> attractions, List<UUID> cafes) {
         this.group = group;
         this.user = user;
+        this.style = style;
+        this.schedule = schedule;
+        this.lodgingCriteria = lodgingCriteria;
+        this.lodgingType = lodgingType;
+        this.mealBudget = mealBudget;
+        this.eatingHabit = eatingHabit;
+        this.distance = distance;
+        this.plusRequirement = plusRequirement;
+        this.restaurants = restaurants;
+        this.attractions = attractions;
+        this.cafes = cafes;
+    }
+
+    public void update(String style, String schedule, String lodgingCriteria, String lodgingType,
+                       String mealBudget, String eatingHabit, String distance, String plusRequirement,
+                       List<UUID> restaurants, List<UUID> attractions, List<UUID> cafes) {
         this.style = style;
         this.schedule = schedule;
         this.lodgingCriteria = lodgingCriteria;

@@ -27,13 +27,17 @@ public class Member {
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "candidate_id")
+    private CandidatePlan candidatePlan;
+
     @Column(nullable = false)
-    private String role;
+    private boolean isLeader;
 
     @Builder
-    public Member(User user, Group group, String role) {
+    public Member(User user, Group group, boolean isLeader) {
         this.user = user;
         this.group = group;
-        this.role = role;
+        this.isLeader = isLeader;
     }
 }

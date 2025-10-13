@@ -6,8 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -32,9 +30,6 @@ public class Attraction {
 
     @Column
     private String info;
-
-    @ManyToMany(mappedBy = "attractions", fetch = FetchType.LAZY)
-    private List<Requirement> requirements = new ArrayList<>();
 
     @Builder
     public Attraction(String name, String region, String location, String info) {
