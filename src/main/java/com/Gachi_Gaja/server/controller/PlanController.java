@@ -2,12 +2,10 @@ package com.Gachi_Gaja.server.controller;
 
 import com.Gachi_Gaja.server.service.GeminiService;
 import com.Gachi_Gaja.server.service.PlanService;
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -21,20 +19,26 @@ public class PlanController {
     여행 계획 생성 메서드
      */
     @PostMapping("/api/groups/{groupId}/plans")
-    public ResponseEntity<?> generateCandidatePlan(@PathVariable UUID groupId) {
+    public ResponseEntity<?> generatePlan(@PathVariable UUID groupId) {
+        planService.generatePlan(groupId);
+
         return ResponseEntity.ok().build();
     }
 
     /*
-   여행 계획 생성 테스트 메서드 (추후 삭제)
-    */
-    /*
-    @PostMapping("api/test/plans")
-    public ResponseEntity<String> generateCandidatePlanTest() {
-        String plan = planService.generatePlanTest();
-
-        return ResponseEntity.ok().body(plan);
-    }
+    여행 계획 전체 조회 메서드
      */
+    @GetMapping("/api/groups/{groupId}/plans")
+    public ResponseEntity<?> getPlan() {
+        return ResponseEntity.ok().build();
+    }
+
+    /*
+    여행 계획 수정 메서드
+     */
+    @PutMapping("/api/groups/{groupId}/plans/{planId}")
+    public ResponseEntity<?> updatePlan() {
+        return ResponseEntity.ok().build();
+    }
 
 }

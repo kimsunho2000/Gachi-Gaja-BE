@@ -1,11 +1,12 @@
 package com.Gachi_Gaja.server.controller;
 
+import com.Gachi_Gaja.server.domain.CandidatePlan;
+import com.Gachi_Gaja.server.dto.CandidatePlanDTO;
+import com.Gachi_Gaja.server.dto.response.CandidatePlanResponseDTO;
 import com.Gachi_Gaja.server.service.CandidatePlanService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -20,19 +21,27 @@ public class CandidatePlanController {
      */
     @PostMapping("/api/groups/{groupId}/candidates")
     public ResponseEntity<?> generateCandidatePlan(@PathVariable UUID groupId) {
+        candidatePlanService.generateCandidatePlan(groupId);
+
         return ResponseEntity.ok().build();
     }
 
     /*
-    여행 계획 생성 테스므 메서드 (추후 삭제)
+    여행 계획 후보 전체 조회 메서드
      */
-    /*
-    @PostMapping("api/test/candidates")
-    public ResponseEntity<String> generateCandidatePlanTest() {
-        String candidatePlan = candidatePlanService.generateCandidatePlanTest();
-
-        return ResponseEntity.ok().body(candidatePlan);
+    @GetMapping("/api/groups/{groupId}/candidates")
+    public ResponseEntity<?> getCandidatePlans() {
+        return ResponseEntity.ok().build();
     }
+
+    /*
+    여행 계획 후보 단일 조회 메서드
      */
+    @GetMapping("/api/groups/{groupId}/candidates/{candidateId}")
+    public ResponseEntity<CandidatePlanResponseDTO> getCandidatePlan(@PathVariable UUID groupId, UUID candidateId) {
+        CandidatePlanResponseDTO response = candidatePlanService.findById(candidateId);
+
+        return ResponseEntity.ok().body(response);
+    }
 
 }
