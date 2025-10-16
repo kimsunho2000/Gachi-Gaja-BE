@@ -1,6 +1,6 @@
-package com.Gachi_Gaja.server.auth.controller;
+package com.Gachi_Gaja.server.controller;
 
-import com.Gachi_Gaja.server.auth.service.UserService;
+import com.Gachi_Gaja.server.service.UserService;
 import com.Gachi_Gaja.server.dto.request.LoginRequestDTO;
 import com.Gachi_Gaja.server.dto.request.UserRequestDTO;
 import com.Gachi_Gaja.server.dto.response.UserResponseDTO;

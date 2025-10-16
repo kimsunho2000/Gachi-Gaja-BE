@@ -1,7 +1,9 @@
-package com.Gachi_Gaja.server.auth.service;
+package com.Gachi_Gaja.server.service;
 
-import com.Gachi_Gaja.server.auth.exception.*;
-import com.Gachi_Gaja.server.auth.repository.UserRepository;
+import com.Gachi_Gaja.server.exception.EmailAlreadyUsedException;
+import com.Gachi_Gaja.server.exception.NotFoundException;
+import com.Gachi_Gaja.server.exception.WrongPasswordException;
+import com.Gachi_Gaja.server.repository.UserRepository;
 import com.Gachi_Gaja.server.domain.User;
 import com.Gachi_Gaja.server.dto.request.LoginRequestDTO;
 import com.Gachi_Gaja.server.dto.request.UserRequestDTO;

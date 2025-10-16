@@ -1,6 +1,6 @@
 package com.Gachi_Gaja.server.service;
 
-import com.Gachi_Gaja.server.Repository.CandidatePlanRepository;
+import com.Gachi_Gaja.server.repository.CandidatePlanRepository;
 import com.Gachi_Gaja.server.domain.CandidatePlan;
 import com.Gachi_Gaja.server.domain.Group;
 import com.Gachi_Gaja.server.dto.response.CandidatePlanResponseDTO;

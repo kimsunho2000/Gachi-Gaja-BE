@@ -1,6 +1,6 @@
 package com.Gachi_Gaja.server.service;
 
-import com.Gachi_Gaja.server.Repository.PlanRepository;
+import com.Gachi_Gaja.server.repository.PlanRepository;
 import com.Gachi_Gaja.server.domain.CandidatePlan;
 import com.Gachi_Gaja.server.domain.Group;
 import com.Gachi_Gaja.server.domain.Plan;
