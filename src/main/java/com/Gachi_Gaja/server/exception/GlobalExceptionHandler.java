@@ -98,6 +98,12 @@ public class GlobalExceptionHandler {
         return build(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
 
+    @ExceptionHandler(WrongPasswordException.class)
+    public ResponseEntity<ErrorResponseDTO> handleWrongPassword(WrongPasswordException ex) {
+        log.warn("401 Wrong Passwd: {}", ex.getMessage());
+        return build(HttpStatus.UNAUTHORIZED, ex.getMessage());
+    }
+
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponseDTO> handleAccessDenied(AccessDeniedException ex) {
         log.warn("403 AccessDenied: {}", ex.getMessage());
@@ -105,7 +111,7 @@ public class GlobalExceptionHandler {
     }
 
     // 404 - 리소스 없음 (그룹/멤버/요구사항 등)
-    @ExceptionHandler({ NoSuchElementException.class, EntityNotFoundException.class, com.Gachi_Gaja.server.auth.exception.NotFoundException.class })
+    @ExceptionHandler({ NoSuchElementException.class, EntityNotFoundException.class, NotFoundException.class })
     public ResponseEntity<ErrorResponseDTO> handleNotFound(Exception ex) {
         log.warn("404 NotFound: {}", ex.getMessage());
         return build(HttpStatus.NOT_FOUND, ex.getMessage());
@@ -120,7 +126,7 @@ public class GlobalExceptionHandler {
 
     // 409 - 중복/무결성 위반
     // 추후 중복 오류 통일 예정
-    @ExceptionHandler({ DataIntegrityViolationException.class, AlreadyExistsException.class, com.Gachi_Gaja.server.auth.exception.NicknameAlreadyUsedException.class, com.Gachi_Gaja.server.auth.exception.EmailAlreadyUsedException.class })
+    @ExceptionHandler({ DataIntegrityViolationException.class, AlreadyExistsException.class, NicknameAlreadyUsedException.class, EmailAlreadyUsedException.class })
     public ResponseEntity<ErrorResponseDTO> handleConflict(Exception ex) {
         log.warn("409 Conflict: {}", ex.getMessage());
         return build(HttpStatus.CONFLICT, ex.getMessage());

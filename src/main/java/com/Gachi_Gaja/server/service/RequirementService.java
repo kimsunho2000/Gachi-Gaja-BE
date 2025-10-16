@@ -1,6 +1,6 @@
 package com.Gachi_Gaja.server.service;
 
-import com.Gachi_Gaja.server.auth.repository.UserRepository;
+import com.Gachi_Gaja.server.repository.UserRepository;
 import com.Gachi_Gaja.server.domain.Group;
 import com.Gachi_Gaja.server.domain.Member;
 import com.Gachi_Gaja.server.domain.Requirement;

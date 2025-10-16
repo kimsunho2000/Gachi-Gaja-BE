@@ -1,5 +1,5 @@
-// com.Gachi_Gaja.server.auth.repository.UserRepository
-package com.Gachi_Gaja.server.auth.repository;
+// com.Gachi_Gaja.server.repository.UserRepository
+package com.Gachi_Gaja.server.repository;
 
 import com.Gachi_Gaja.server.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
