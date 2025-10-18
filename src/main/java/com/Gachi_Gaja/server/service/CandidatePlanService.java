@@ -1,16 +1,23 @@
 package com.Gachi_Gaja.server.service;
 
+import com.Gachi_Gaja.server.domain.Member;
+import com.Gachi_Gaja.server.domain.User;
+import com.Gachi_Gaja.server.dto.response.GroupResponseDTO;
 import com.Gachi_Gaja.server.repository.CandidatePlanRepository;
 import com.Gachi_Gaja.server.domain.CandidatePlan;
 import com.Gachi_Gaja.server.domain.Group;
 import com.Gachi_Gaja.server.dto.response.CandidatePlanResponseDTO;
 import com.Gachi_Gaja.server.dto.response.RequirementResponseDTO;
 import com.Gachi_Gaja.server.dto.response.TotalRequirementResponseDTO;
+import com.Gachi_Gaja.server.repository.GroupRepository;
+import com.Gachi_Gaja.server.repository.MemberRepository;
+import com.Gachi_Gaja.server.repository.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -22,9 +29,12 @@ import java.util.stream.Collectors;
 public class CandidatePlanService {
 
     private final CandidatePlanRepository candidatePlanRepository;
+    private final GroupRepository groupRepository;
+    private final UserRepository userRepository;
+    private final MemberRepository memberRepository;
+
     private final GeminiService geminiService;
     private final RequirementService requirementService;
-
     /*
     RequirementResponseDTO의 한 속성을 {category=count, ...} 형식의 map으로 변환해 반환하는 함수
      */
@@ -41,9 +51,16 @@ public class CandidatePlanService {
     여행 계획 후보 생성 메서드
      */
     @Transactional
-    public void generateCandidatePlan(UUID groupId) {
-        // 모임 정보 가져오기
-        Group group = null;
+    public void generateCandidatePlan(UUID groupId, UUID userId) {
+        // 모임 가져오기
+        Group group = groupRepository.findById(groupId).orElseThrow(() -> new EntityNotFoundException("모임을 찾을 수 없습니다."));
+
+        // 리더 확인 (리더가 아닐 시 생성 불가)
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
+        Member member = memberRepository.findByGroupAndUser(group, user).orElseThrow(() -> new EntityNotFoundException("멤버를 찾을 수 없습니다."));
+
+        if (member.isLeader() != true)
+            throw new IllegalArgumentException("리더만 여행 계획 후보를 생성할 수 있습니다.");
 
         // 요구사항 가져오기
         TotalRequirementResponseDTO requirementInfo = requirementService.getRequirement(groupId);
@@ -65,13 +82,12 @@ public class CandidatePlanService {
         String prompt = "당신은 여행 정보와 요구 사항을 바탕으로 최적의 여행 계획을 제시하는 여행 플래너입니다.\n" +
                 "아래 정보를 토대로 최적의 여행 계획을 제시하라.\n" +
                 "[여행 정보]\n" +
-                "- 모임 관계 : \n" +
-                "- 여행지 : \n" +
-                "- 시작 장소, 시간 : \n" +
-                "- 종료 장소, 시간 : \n" +
-                "- 교통 수단 : \n" +
-                "- 여행 기간 : \n" +
-                "- 인당 예산 :\n" +
+                "- 여행지 : " + group.getRegion() + "\n" +
+                "- 시작 장소 : " + group.getStartingPoint() + ", " + "\n"  +
+                "- 종료 장소 : " + group.getEndingPoint() + "\n" +
+                "- 교통 수단 : " + group.getTransportation() + "\n" +
+                "- 여행 기간 : " + group.getPeriod() + "\n" +
+                "- 인당 예산: " + group.getBudget() + "\n" +
                 "- 인원 : " + totalMembers + "\n" +
                 "[요구 사항]\n" +
                 "- 여행 스타일 : " + styles.toString() + "\n" +
@@ -103,20 +119,28 @@ public class CandidatePlanService {
                 "- 계획 설명은 해당 계획을 세운 근거를 100자 내외로 작성";
 
         // Gemini 호출 및 답변 받기
-        String planContent = geminiService.generateContent(prompt);
+        List<String> planContents = geminiService.generateContent(prompt, 2);
 
-        // 여행 계획 후보 생성
-        CandidatePlan candidatePlan = new CandidatePlan(group, planContent, 0, false);
+        // 여행 계획 후보 생성 및 저장
+        candidatePlanRepository.save(new CandidatePlan(group, planContents.get(0), 0, false));
+        candidatePlanRepository.save(new CandidatePlan(group, planContents.get(1), 0, false));
 
-        // 여행 계획 후보 저장
-        candidatePlanRepository.save(candidatePlan);
+        // 투표 기한 설정
+        LocalDate deadline = LocalDate.now().plusDays(2);
+        group.setVoteDeadline(deadline);
     }
 
     /*
     여행 계획 후보 전체 조회 메서드
      */
-    public List<CandidatePlanResponseDTO> findByAll() {
-        return null;
+    public List<CandidatePlanResponseDTO> findByAll(UUID groupId) {
+        Group group = groupRepository.findById(groupId).orElseThrow(() -> new EntityNotFoundException("모임을 찾을 수 없습니다."));
+
+        List<CandidatePlanResponseDTO> candidatePlans = group.getCandidatePlans().stream()
+                .map(candidatePlan -> CandidatePlanResponseDTO.from(candidatePlan))
+                .toList();
+
+        return candidatePlans;
     }
 
     /*

@@ -5,6 +5,7 @@ import com.Gachi_Gaja.server.dto.request.LoginRequestDTO;
 import com.Gachi_Gaja.server.dto.request.UserRequestDTO;
 import com.Gachi_Gaja.server.dto.response.UserResponseDTO;
 import com.Gachi_Gaja.server.domain.User;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -20,9 +21,13 @@ public class AuthController {
 
     // 로그인
     @PostMapping("/api/login")
-    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO request) {
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO request, HttpSession session) {
         User user = userService.login(request);
         record LoginResponse(UUID userId, String message) {}
+
+        // 세션에 userId 저장 (Swagger 테스트용)
+        session.setAttribute("userId", user.getUserId());
+
         return ResponseEntity.ok(new LoginResponse(user.getUserId(), "로그인이 완료되었습니다."));
     }
 

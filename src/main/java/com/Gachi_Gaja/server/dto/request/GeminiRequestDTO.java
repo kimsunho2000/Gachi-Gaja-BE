@@ -37,7 +37,7 @@ public class GeminiRequestDTO {
         private double temperature;
     }
 
-    public GeminiRequestDTO(String prompt) {
+    public GeminiRequestDTO(String prompt, int candidateCount) {
         Parts parts = new Parts();
         parts.setText(prompt);
         Content content = new Content();
@@ -46,7 +46,7 @@ public class GeminiRequestDTO {
         this.contents.add(content);
 
         this.generationConfig = new GenerationConfig();
-        this.generationConfig.setCandidate_count(1);
+        this.generationConfig.setCandidate_count(candidateCount);
         this.generationConfig.setMax_output_tokens(1000000);
         this.generationConfig.setTemperature(0.7);
     }
