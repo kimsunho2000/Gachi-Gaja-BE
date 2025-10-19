@@ -7,13 +7,13 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
-
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(csrf -> csrf.disable()) // REST API니까 CSRF 비활성화
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/login", "/api/users").permitAll() // 로그인, 회원가입 허용
+                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**").permitAll()  // Swagger 허용
                         .anyRequest().permitAll() // JWT 적용 전까진 임시로 모두 허용
                 );
 

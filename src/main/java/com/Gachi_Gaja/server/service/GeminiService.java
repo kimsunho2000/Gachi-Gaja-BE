@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Service
 @RequiredArgsConstructor
 /*
@@ -29,9 +32,9 @@ public class GeminiService {
     prompt 프롬프트
     return 답변
      */
-    public String generateContent(String prompt) {
+    public List<String> generateContent(String prompt, int candidateCount) {
         // request 설정
-        GeminiRequestDTO request = new GeminiRequestDTO(prompt);
+        GeminiRequestDTO request = new GeminiRequestDTO(prompt, candidateCount);
 
         // 요청 전송 준비
         String url = baseUrl + model + ":generateContent?key=" + apiKey;  // url
@@ -41,9 +44,12 @@ public class GeminiService {
         response = template.postForObject(url, request, GeminiResponseDTO.class); // response
 
         // 요청 전송
-        String content = response.getCandidates().get(0).getContent().getParts().get(0).getText().toString();
+        List<String> contents = response.getCandidates()
+                .stream()
+                .map(candidate -> candidate.getContent().getParts().get(0).getText().toString())
+                .collect(Collectors.toList());
 
-        return content;
+        return contents;
     }
 
 }

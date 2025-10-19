@@ -55,17 +55,17 @@ public class Requirement {
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "restaurant_uuid", joinColumns = @JoinColumn(name = "requirement_id"))
-    @Column(name = "restaurant_uuid", nullable = false)
+    @Column(name = "restaurant_uuid", nullable = true)
     private List<UUID> restaurants = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "attraction_uuid", joinColumns = @JoinColumn(name = "requirement_id"))
-    @Column(name = "attraction_uuid", nullable = false)
+    @Column(name = "attraction_uuid", nullable = true)
     private List<UUID> attractions = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name = "cafe_uuid", joinColumns = @JoinColumn(name = "requirement_id"))
-    @Column(name = "cafe_uuid", nullable = false)
+    @Column(name = "cafe_uuid", nullable = true)
     private List<UUID> cafes = new ArrayList<>();
 
     @Builder

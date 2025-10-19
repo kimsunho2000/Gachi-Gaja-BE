@@ -22,7 +22,7 @@ public class CandidatePlan {
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
-    @Column(nullable = false, name = "plan_content")
+    @Column(nullable = false, name = "plan_content", columnDefinition = "LONGTEXT")
     private String planContent;
 
     @Column(nullable = false, name = "vote_count") //

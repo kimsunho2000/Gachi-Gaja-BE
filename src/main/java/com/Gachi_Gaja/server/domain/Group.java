@@ -58,6 +58,9 @@ public class Group {
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<CandidatePlan> candidatePlans = new ArrayList<>();
 
+    @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Plan> plans = new ArrayList<>();
+
     @Builder
     public Group(String title, String region, String startingPoint, String endingPoint,
                  String transportation, String period, int budget,
@@ -72,4 +75,12 @@ public class Group {
         this.requirementDeadline = requirementDeadline;
         this.voteDeadline = voteDeadline;
     }
+
+    /*
+    여행 계획 생성 시 투표 마감일 설정
+     */
+    public void setVoteDeadline(LocalDate deadline) {
+        this.voteDeadline = deadline;
+    }
+
 }

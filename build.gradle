@@ -11,7 +11,7 @@ description = 'Demo project for Spring Boot'
 java {
 	toolchain {
 		languageVersion = JavaLanguageVersion.of(21)
-		// languageVersion = JavaLanguageVersion.of(17) 	// 21 버전이 없어 수정
+		// languageVersion = JavaLanguageVersion.of(17)
 	}
 }
 
@@ -38,10 +38,13 @@ dependencies {
 	// Gemini 연동
 	implementation 'com.google.genai:google-genai:1.0.0'
 
-	//---로그인 및 회원관리를 위해 추가---
+	// 로그인 및 회원 관리
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
-	// JWT (나중에 쓸 예정)
+	// JWT (추후 구현)
+
+	// Swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 }
 
 tasks.named('test') {
