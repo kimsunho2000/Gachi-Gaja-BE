@@ -27,10 +27,6 @@ public class Member {
     @JoinColumn(name = "group_id", nullable = false)
     private Group group;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "candidate_id")
-    private CandidatePlan candidatePlan;
-
     @Column(nullable = false)
     private boolean isLeader;
 

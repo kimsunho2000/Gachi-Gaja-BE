@@ -51,6 +51,7 @@ public class GroupService {
                 .budget(dto.getBudget())
                 .requirementDeadline(dto.getRDeadline())
                 .voteDeadline(null)
+                .callCnt(3)
                 .build();
 
         groupRepository.save(group);

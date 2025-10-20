@@ -2,6 +2,7 @@ package com.Gachi_Gaja.server.service;
 
 import com.Gachi_Gaja.server.domain.Member;
 import com.Gachi_Gaja.server.domain.User;
+import com.Gachi_Gaja.server.dto.CandidatePlanInfoDTO;
 import com.Gachi_Gaja.server.dto.response.GroupResponseDTO;
 import com.Gachi_Gaja.server.repository.CandidatePlanRepository;
 import com.Gachi_Gaja.server.domain.CandidatePlan;
@@ -17,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.naming.LimitExceededException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +53,7 @@ public class CandidatePlanService {
     여행 계획 후보 생성 메서드
      */
     @Transactional
-    public void generateCandidatePlan(UUID groupId, UUID userId) {
+    public void generateCandidatePlan(UUID groupId, UUID userId) throws LimitExceededException {
         // 모임 가져오기
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new EntityNotFoundException("모임을 찾을 수 없습니다."));
 
@@ -61,6 +63,8 @@ public class CandidatePlanService {
 
         if (member.isLeader() != true)
             throw new IllegalArgumentException("리더만 여행 계획 후보를 생성할 수 있습니다.");
+        if (group.getCallCnt() <= 0)
+            throw new LimitExceededException("여행 계획 후보 생성 횟수를 초과했습니다.");
 
         // 요구사항 가져오기
         TotalRequirementResponseDTO requirementInfo = requirementService.getRequirement(groupId);
@@ -118,8 +122,12 @@ public class CandidatePlanService {
                 "- 출력 예시에 맞춰 간결히 출력하고 그 외는 출력 X\n" +
                 "- 계획 설명은 해당 계획을 세운 근거를 100자 내외로 작성";
 
-        // Gemini 호출 및 답변 받기
-        List<String> planContents = geminiService.generateContent(prompt, 2);
+        if (group.getCallCnt() < 3) {   // 기존 여행 계획 후보 삭제
+            delete(group.getCandidatePlans().get(0));
+            delete(group.getCandidatePlans().get(1));
+        }
+        List<String> planContents = geminiService.generateContent(prompt, 2);   // Gemini 호출 및 답변 받기
+        group.decreaseCallCnt();    // AI 호출 횟수 1 감소
 
         // 여행 계획 후보 생성 및 저장
         candidatePlanRepository.save(new CandidatePlan(group, planContents.get(0), 0, false));
@@ -133,32 +141,35 @@ public class CandidatePlanService {
     /*
     여행 계획 후보 전체 조회 메서드
      */
-    public List<CandidatePlanResponseDTO> findByAll(UUID groupId) {
+    @Transactional
+    public CandidatePlanResponseDTO findByAll(UUID groupId, UUID userId) {
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new EntityNotFoundException("모임을 찾을 수 없습니다."));
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
+        Member member = memberRepository.findByGroupAndUser(group, user).orElseThrow(() -> new EntityNotFoundException("멤버를 찾을 수 없습니다."));
 
-        List<CandidatePlanResponseDTO> candidatePlans = group.getCandidatePlans().stream()
-                .map(candidatePlan -> CandidatePlanResponseDTO.from(candidatePlan))
+        List<CandidatePlanInfoDTO> candidatePlans = group.getCandidatePlans().stream()
+                .map(candidatePlan -> CandidatePlanInfoDTO.from(candidatePlan, false))  // 투표 정부 추후 구현
                 .toList();
 
-        return candidatePlans;
+        return CandidatePlanResponseDTO.from(groupId, member.isLeader(), group.getCallCnt(), candidatePlans);
     }
 
     /*
     여행 계획 후보 단일 조회 메서드
-     */
     @Transactional
     public CandidatePlanResponseDTO findById(UUID id) {
         CandidatePlan candidatePlan = candidatePlanRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("여행 계획을 찾을 수 없습니다."));
 
         return CandidatePlanResponseDTO.from(candidatePlan);
     }
+     */
 
     /*
     여행 계획 후보 삭제 메서드
      */
     @Transactional
-    public void delete(UUID id) {
-        candidatePlanRepository.deleteById(id);
+    public void delete(CandidatePlan candidatePlan) {
+        candidatePlanRepository.delete(candidatePlan);
     }
 
 }

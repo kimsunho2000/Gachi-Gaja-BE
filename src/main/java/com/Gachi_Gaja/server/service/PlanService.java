@@ -12,6 +12,7 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.naming.LimitExceededException;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -41,7 +42,7 @@ public class PlanService {
         Member member = memberRepository.findByGroupAndUser(group, user).orElseThrow(() -> new EntityNotFoundException("멤버를 찾을 수 없습니다."));
 
         if (member.isLeader() != true)
-            throw new IllegalArgumentException("리더만 여행 계획 후보를 생성할 수 있습니다.");
+            throw new IllegalArgumentException("리더만 여행 계획을 생성할 수 있습니다.");
 
         // 여행 계획 후보 가져오기
         CandidatePlan candidatePlan = group.getCandidatePlans().get(0);

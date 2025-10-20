@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -49,6 +50,9 @@ public class Group {
     @Column(name = "vote_deadline")
     private LocalDate voteDeadline;
 
+    @Column(name = "call_count")
+    private int callCnt;    // AI 호출 횟수
+
     @OneToMany(mappedBy = "group", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Member> members = new ArrayList<>();
 
@@ -64,7 +68,7 @@ public class Group {
     @Builder
     public Group(String title, String region, String startingPoint, String endingPoint,
                  String transportation, String period, int budget,
-                 LocalDate requirementDeadline, LocalDate voteDeadline) {
+                 LocalDate requirementDeadline, LocalDate voteDeadline, int callCnt) {
         this.title = title;
         this.region = region;
         this.startingPoint = startingPoint;
@@ -74,13 +78,21 @@ public class Group {
         this.budget = budget;
         this.requirementDeadline = requirementDeadline;
         this.voteDeadline = voteDeadline;
+        this.callCnt = callCnt;
     }
 
     /*
-    여행 계획 생성 시 투표 마감일 설정
+    여행 계획 후보 생성 시 투표 마감일 설정
      */
     public void setVoteDeadline(LocalDate deadline) {
         this.voteDeadline = deadline;
+    }
+
+    /*
+    여행 계획 후보 생성 시 AI 호출 횟수 감소
+     */
+    public void decreaseCallCnt() {
+        callCnt -= 1;
     }
 
 }
