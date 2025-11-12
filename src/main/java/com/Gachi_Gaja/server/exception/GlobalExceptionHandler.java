@@ -126,7 +126,7 @@ public class GlobalExceptionHandler {
 
     // 409 - 중복/무결성 위반
     // 추후 중복 오류 통일 예정
-    @ExceptionHandler({ DataIntegrityViolationException.class, AlreadyExistsException.class, NicknameAlreadyUsedException.class, EmailAlreadyUsedException.class })
+    @ExceptionHandler({ DataIntegrityViolationException.class, AlreadyExistsException.class, NicknameAlreadyUsedException.class, EmailAlreadyUsedException.class, GroupFullException.class, DeadlinePassedException.class })
     public ResponseEntity<ErrorResponseDTO> handleConflict(Exception ex) {
         log.warn("409 Conflict: {}", ex.getMessage());
         return build(HttpStatus.CONFLICT, ex.getMessage());
