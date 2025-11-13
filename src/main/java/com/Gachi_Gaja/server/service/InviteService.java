@@ -32,28 +32,29 @@ public class InviteService {
     @Transactional
     public ResponseEntity<Void> joinGroup(UUID userId, UUID groupId) {
 
-        // groupId로 Group 엔티티 조회
-        Group group = groupRepository.findById(groupId)
+        // 사용자 체크
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("해당 사용자를 찾을 수 없습니다."));
+
+        // groupId로 Group 엔티티 조회 (비관적 락 적용)
+        Group group = groupRepository.findByIdWithPessimisticLock(groupId)
                 .orElseThrow(() -> new NotFoundException("해당 그룹을 찾을 수 없습니다."));
 
-        // group에 이미 참여시 가입 불가
-        if (memberRepository.existsByGroup_IdAndUserId(groupId, userId)) {
-            throw new AlreadyExistsException("이미 해당 그룹에 참가 중입니다.");
-        }
-
-        // group 인원 수 초과시 가입 불가
-        if (memberRepository.countByGroup(group) > MAX_GROUP_MEMBERS) {
-            throw new GroupFullException("이미 만원인 그룹입니다.");
-        }
-
-        // 의견 입력 기간 종료시 가입 불가
+        // 마감일 체크
         LocalDate deadLine = group.getRequirementDeadline();
         if (deadLine == null || deadLine.isBefore(LocalDate.now())) {
             throw new DeadlinePassedException("의견 입력 기간이 종료되어 가입할 수 없습니다.");
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("해당 사용자를 찾을 수 없습니다."));
+        // 중복 가입 체크
+        if (memberRepository.existsByGroup_GroupIdAndUser_UserId(groupId, userId)) {
+            throw new AlreadyExistsException("이미 해당 그룹에 참가 중입니다.");
+        }
+
+        // 인원 수 체크
+        if (memberRepository.countByGroup(group) >= MAX_GROUP_MEMBERS) {
+            throw new GroupFullException("이미 만원인 그룹입니다.");
+        }
 
         // Member에 포함
         Member member = Member.builder()
@@ -64,7 +65,7 @@ public class InviteService {
 
         memberRepository.save(member);
 
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
 }

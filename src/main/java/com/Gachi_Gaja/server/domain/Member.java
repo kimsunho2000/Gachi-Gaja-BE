@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Entity
-@Table(name = "members")
+@Table(name = "members",uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"group_id", "user_id"})})
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Member {
