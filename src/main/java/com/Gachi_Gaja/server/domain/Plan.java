@@ -1,10 +1,13 @@
 package com.Gachi_Gaja.server.domain;
 
+import com.Gachi_Gaja.server.dto.request.PlanRequestDTO;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
@@ -50,6 +53,26 @@ public class Plan {
         this.info = info;
         this.transportation = transportation;
         this.cost = cost;
+    }
+
+    public void update(PlanRequestDTO newPlan) {
+        this.startingTime = newPlan.getStartingTime();
+        this.endingTime = newPlan.getEndingTime();
+        this.location = newPlan.getLocation();
+        this.info = newPlan.getInfo();
+        this.transportation = newPlan.getTransportation();
+        this.cost = newPlan.getCost();
+    }
+
+    public void updateTime(boolean isAdd, Duration time) {
+        if (isAdd) {
+            this.startingTime = this.startingTime.plus(time);
+            this.endingTime = this.endingTime.plus(time);
+        }
+        else {
+            this.startingTime = this.startingTime.minus(time);
+            this.endingTime = this.endingTime.minus(time);
+        }
     }
 
 }
