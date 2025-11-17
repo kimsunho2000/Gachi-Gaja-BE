@@ -24,7 +24,7 @@ public record PlanInfoDTO(
                 .endingTime(plan.getEndingTime())
                 .location(plan.getLocation())
                 .info(plan.getInfo())
-                .transportation(plan.getInfo())
+                .transportation(plan.getTransportation())
                 .cost(plan.getCost())
                 .build();
     }
