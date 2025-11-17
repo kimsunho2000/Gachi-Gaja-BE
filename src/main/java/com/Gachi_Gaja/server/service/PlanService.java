@@ -2,6 +2,7 @@ package com.Gachi_Gaja.server.service;
 
 import com.Gachi_Gaja.server.domain.*;
 import com.Gachi_Gaja.server.dto.PlanInfoDTO;
+import com.Gachi_Gaja.server.dto.request.PlanRequestDTO;
 import com.Gachi_Gaja.server.repository.GroupRepository;
 import com.Gachi_Gaja.server.repository.MemberRepository;
 import com.Gachi_Gaja.server.repository.PlanRepository;
@@ -13,7 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.naming.LimitExceededException;
+import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -109,6 +112,7 @@ public class PlanService {
         Group group = groupRepository.findById(groupId).orElseThrow(() -> new EntityNotFoundException("모임을 찾을 수 없습니다."));
 
         List<PlanInfoDTO> planInfos = group.getPlans().stream()
+                .sorted(Comparator.comparing(Plan::getStartingTime))    // 시간순 정렬
                 .map(plan -> PlanInfoDTO.from(plan))
                 .collect(Collectors.toList());
 
@@ -121,11 +125,61 @@ public class PlanService {
     }
 
     /*
+    여행 계획 수정 메서드
+     */
+    @Transactional
+    public void update(UUID groupId, UUID planId, UUID userId, PlanRequestDTO request) {
+        // 모임 가져오기
+        Group group = groupRepository.findById(groupId).orElseThrow(() -> new EntityNotFoundException("모임을 찾을 수 없습니다."));
+
+        // 리더 확인 (리더가 아닐 시 생성 불가)
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
+        Member member = memberRepository.findByGroupAndUser(group, user).orElseThrow(() -> new EntityNotFoundException("멤버를 찾을 수 없습니다."));
+
+        if (member.isLeader() != true)
+            throw new IllegalArgumentException("리더만 여행 계획을 수정할 수 있습니다.");
+
+        // 여행 계획 수정
+        Plan plan = planRepository.findById(planId).orElseThrow(() -> new EntityNotFoundException("여행 계획을 찾을 수 없습니다."));
+        plan.update(request);
+    }
+
+    /*
+    여행 계획 추가 메서드
+     */
+    @Transactional
+    public void add(UUID groupId, UUID userId, PlanRequestDTO request) {
+        // 모임 가져오기
+        Group group = groupRepository.findById(groupId).orElseThrow(() -> new EntityNotFoundException("모임을 찾을 수 없습니다."));
+
+        // 리더 확인 (리더가 아닐 시 생성 불가)
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
+        Member member = memberRepository.findByGroupAndUser(group, user).orElseThrow(() -> new EntityNotFoundException("멤버를 찾을 수 없습니다."));
+
+        if (member.isLeader() != true)
+            throw new IllegalArgumentException("리더만 여행 계획을 추가할 수 있습니다.");
+
+        // 여행 계획 추가
+        planRepository.save(request.toEntity(group));
+    }
+
+    /*
     여행 계획 삭제 메서드
      */
     @Transactional
-    public void delete(UUID id) {
-        planRepository.deleteById(id);
+    public void delete(UUID groupId, UUID planId, UUID userId) {
+        // 모임 가져오기
+        Group group = groupRepository.findById(groupId).orElseThrow(() -> new EntityNotFoundException("모임을 찾을 수 없습니다."));
+
+        // 리더 확인 (리더가 아닐 시 생성 불가)
+        User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
+        Member member = memberRepository.findByGroupAndUser(group, user).orElseThrow(() -> new EntityNotFoundException("멤버를 찾을 수 없습니다."));
+
+        if (member.isLeader() != true)
+            throw new IllegalArgumentException("리더만 여행 계획을 삭제할 수 있습니다.");
+
+        // 여행 계획 삭제
+        planRepository.deleteById(planId);
     }
 
 }
