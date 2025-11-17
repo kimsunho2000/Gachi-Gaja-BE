@@ -38,4 +38,12 @@ public class CandidatePlan {
         this.voteCount = voteCount;
         this.isVoted = isVoted;
     }
+
+    public void updateVoted(boolean voted) {
+        this.isVoted = voted;
+    }
+
+    public void updateVoteCount(int count) {
+        this.voteCount = count;
+    }
 }
