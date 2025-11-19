@@ -3,7 +3,6 @@ package com.Gachi_Gaja.server.service;
 import com.Gachi_Gaja.server.domain.Member;
 import com.Gachi_Gaja.server.domain.User;
 import com.Gachi_Gaja.server.dto.CandidatePlanInfoDTO;
-import com.Gachi_Gaja.server.dto.response.GroupResponseDTO;
 import com.Gachi_Gaja.server.repository.CandidatePlanRepository;
 import com.Gachi_Gaja.server.domain.CandidatePlan;
 import com.Gachi_Gaja.server.domain.Group;
@@ -20,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.naming.LimitExceededException;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -44,6 +44,7 @@ public class CandidatePlanService {
         Map<String, Long> map = requirements.stream()
                 .map(category)  // category에 해당하는 필드만 추출
                 .filter(s -> s != null && !s.trim().isEmpty())     // 입력하지 않은 경우 제외
+                .flatMap(s -> Arrays.stream(s.split("/")))  // 다중 선택 처리
                 .collect(Collectors.groupingBy(s -> s, Collectors.counting()));     // {category=count, ...} 형식으로 변환
 
         return map;
