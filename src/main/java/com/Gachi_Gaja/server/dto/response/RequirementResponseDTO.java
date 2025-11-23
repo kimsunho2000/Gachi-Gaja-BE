@@ -22,10 +22,8 @@ public record RequirementResponseDTO(
         String mealBudget,
         String eatingHabit,
         String distance,
-        String plusRequirement,
-        List<UUID> restaurantInfoList,
-        List<UUID> attractionInfoList,
-        List<UUID> cafeInfoList
+        String plusRequirement
+
 ) {
     public static RequirementResponseDTO from(Requirement r, User u, Member m) {
         return RequirementResponseDTO.builder()
@@ -41,9 +39,6 @@ public record RequirementResponseDTO(
                 .eatingHabit(r.getEatingHabit())
                 .distance(r.getDistance())
                 .plusRequirement(r.getPlusRequirement())
-                .restaurantInfoList(r.getRestaurants())
-                .attractionInfoList(r.getAttractions())
-                .cafeInfoList(r.getCafes())
                 .build();
     }
 

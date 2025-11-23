@@ -89,13 +89,8 @@ public class RequirementService {
         // 중복 검증
         validateRequirementNotExists(user, group);
 
-        // UUID 변환
-        List<UUID> restaurantUuids = convertToUuidList(dto.getRestaurants());
-        List<UUID> attractionUuids = convertToUuidList(dto.getAttractions());
-        List<UUID> cafeUuids = convertToUuidList(dto.getCafes());
-
         // 요구사항 생성 및 저장
-        Requirement requirement = dto.toEntity(group, user, restaurantUuids, attractionUuids, cafeUuids);
+        Requirement requirement = dto.toEntity(group, user);
         Requirement savedRequirement = requirementRepository.save(requirement);
 
         return RequirementResponseDTO.from(savedRequirement, user, member);

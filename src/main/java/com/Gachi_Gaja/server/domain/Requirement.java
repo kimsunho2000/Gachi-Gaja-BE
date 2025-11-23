@@ -5,9 +5,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -53,26 +50,10 @@ public class Requirement {
     @Column(name = "plus_requirement")
     private String plusRequirement;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "restaurant_uuid", joinColumns = @JoinColumn(name = "requirement_id"))
-    @Column(name = "restaurant_uuid", nullable = true)
-    private List<UUID> restaurants = new ArrayList<>();
-
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "attraction_uuid", joinColumns = @JoinColumn(name = "requirement_id"))
-    @Column(name = "attraction_uuid", nullable = true)
-    private List<UUID> attractions = new ArrayList<>();
-
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "cafe_uuid", joinColumns = @JoinColumn(name = "requirement_id"))
-    @Column(name = "cafe_uuid", nullable = true)
-    private List<UUID> cafes = new ArrayList<>();
-
     @Builder
     public Requirement(Group group, User user, String style, String schedule,
                       String lodgingCriteria, String lodgingType, String mealBudget,
-                      String eatingHabit, String distance, String plusRequirement,
-                      List<UUID> restaurants, List<UUID> attractions, List<UUID> cafes) {
+                      String eatingHabit, String distance, String plusRequirement) {
         this.group = group;
         this.user = user;
         this.style = style;
@@ -83,14 +64,10 @@ public class Requirement {
         this.eatingHabit = eatingHabit;
         this.distance = distance;
         this.plusRequirement = plusRequirement;
-        this.restaurants = restaurants;
-        this.attractions = attractions;
-        this.cafes = cafes;
     }
 
     public void update(String style, String schedule, String lodgingCriteria, String lodgingType,
-                       String mealBudget, String eatingHabit, String distance, String plusRequirement,
-                       List<UUID> restaurants, List<UUID> attractions, List<UUID> cafes) {
+                       String mealBudget, String eatingHabit, String distance, String plusRequirement) {
         this.style = style;
         this.schedule = schedule;
         this.lodgingCriteria = lodgingCriteria;
@@ -99,9 +76,6 @@ public class Requirement {
         this.eatingHabit = eatingHabit;
         this.distance = distance;
         this.plusRequirement = plusRequirement;
-        this.restaurants = restaurants;
-        this.attractions = attractions;
-        this.cafes = cafes;
     }
 }
 
