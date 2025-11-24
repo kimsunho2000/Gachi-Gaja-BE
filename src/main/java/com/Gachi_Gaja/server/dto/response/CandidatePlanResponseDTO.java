@@ -1,9 +1,6 @@
 package com.Gachi_Gaja.server.dto.response;
 
-import com.Gachi_Gaja.server.domain.CandidatePlan;
-import com.Gachi_Gaja.server.domain.Group;
 import com.Gachi_Gaja.server.dto.CandidatePlanInfoDTO;
-import jakarta.persistence.*;
 import lombok.Builder;
 
 import java.util.List;
