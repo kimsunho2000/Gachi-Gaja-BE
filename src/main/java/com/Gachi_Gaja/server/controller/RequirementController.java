@@ -4,12 +4,12 @@ import com.Gachi_Gaja.server.dto.request.RequirementRequestDTO;
 import com.Gachi_Gaja.server.dto.response.RequirementResponseDTO;
 import com.Gachi_Gaja.server.dto.response.TotalRequirementResponseDTO;
 import com.Gachi_Gaja.server.service.RequirementService;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.UUID;
 
@@ -20,10 +20,16 @@ public class RequirementController {
 
     private final RequirementService requirementService;
 
-    @PostMapping("/api/groups/{groupId}/requirements")
-    public ResponseEntity<RequirementResponseDTO> generateRequirement(@Validated @RequestBody RequirementRequestDTO request, @PathVariable UUID groupId, HttpSession httpSession) {
+    // JWT 기반 userId 추출 메서드
+    private UUID getUserId() {
+        return (UUID) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+    }
 
-        UUID userId = (UUID) httpSession.getAttribute("userId");
+    @PostMapping("/api/groups/{groupId}/requirements")
+    public ResponseEntity<RequirementResponseDTO> generateRequirement(@Validated @RequestBody RequirementRequestDTO request, @PathVariable UUID groupId) {
+
+        UUID userId = getUserId();
         RequirementResponseDTO response = requirementService.generateRequirement(userId, groupId, request);
         return ResponseEntity.ok(response);
     }
@@ -35,9 +41,9 @@ public class RequirementController {
     }
 
     @PutMapping("/api/groups/{groupId}/requirements/{requirementId}")
-    public ResponseEntity<RequirementResponseDTO> putRequirement(@Validated @RequestBody RequirementRequestDTO request, @PathVariable UUID groupId,@PathVariable UUID requirementId, HttpSession httpSession) {
+    public ResponseEntity<RequirementResponseDTO> putRequirement(@Validated @RequestBody RequirementRequestDTO request, @PathVariable UUID groupId, @PathVariable UUID requirementId) {
 
-        UUID userId = (UUID) httpSession.getAttribute("userId");
+        UUID userId = getUserId();
         RequirementResponseDTO response = requirementService.putRequirement(userId, groupId, requirementId, request);
         return ResponseEntity.ok(response);
     }

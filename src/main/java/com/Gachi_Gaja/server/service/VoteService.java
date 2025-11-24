@@ -1,12 +1,19 @@
 package com.Gachi_Gaja.server.service;
 
 import com.Gachi_Gaja.server.domain.*;
+import com.Gachi_Gaja.server.domain.CandidatePlan;
+import com.Gachi_Gaja.server.domain.Member;
+import com.Gachi_Gaja.server.domain.MemberVote;
 import com.Gachi_Gaja.server.dto.CandidatePlanInfoDTO;
 import com.Gachi_Gaja.server.dto.request.VoteRequestDTO;
 import com.Gachi_Gaja.server.dto.response.VoteResponseDTO;
 import com.Gachi_Gaja.server.exception.NotFoundException;
 import com.Gachi_Gaja.server.repository.*;
 
+import com.Gachi_Gaja.server.repository.CandidatePlanRepository;
+import com.Gachi_Gaja.server.repository.GroupRepository;
+import com.Gachi_Gaja.server.repository.MemberRepository;
+import com.Gachi_Gaja.server.repository.MemberVoteRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

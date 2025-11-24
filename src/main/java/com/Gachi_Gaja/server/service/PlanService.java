@@ -1,6 +1,11 @@
 package com.Gachi_Gaja.server.service;
 
 import com.Gachi_Gaja.server.domain.*;
+import com.Gachi_Gaja.server.domain.CandidatePlan;
+import com.Gachi_Gaja.server.domain.Group;
+import com.Gachi_Gaja.server.domain.Member;
+import com.Gachi_Gaja.server.domain.Plan;
+import com.Gachi_Gaja.server.domain.User;
 import com.Gachi_Gaja.server.dto.PlanInfoDTO;
 import com.Gachi_Gaja.server.dto.request.PlanRequestDTO;
 import com.Gachi_Gaja.server.repository.GroupRepository;
@@ -13,8 +18,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import javax.naming.LimitExceededException;
-import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;

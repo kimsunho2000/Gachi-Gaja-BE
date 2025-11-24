@@ -2,13 +2,11 @@ package com.Gachi_Gaja.server.dto.request;
 
 import com.Gachi_Gaja.server.domain.Group;
 import com.Gachi_Gaja.server.domain.Plan;
-import jakarta.persistence.Column;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 @Data
 @NoArgsConstructor

@@ -5,7 +5,6 @@ import com.Gachi_Gaja.server.domain.Requirement;
 import com.Gachi_Gaja.server.domain.User;
 import lombok.Builder;
 
-import java.util.List;
 import java.util.UUID;
 
 @Builder

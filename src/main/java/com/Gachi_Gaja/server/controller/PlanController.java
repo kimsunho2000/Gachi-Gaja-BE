@@ -3,11 +3,11 @@ package com.Gachi_Gaja.server.controller;
 import com.Gachi_Gaja.server.dto.request.PlanRequestDTO;
 import com.Gachi_Gaja.server.dto.response.PlanResponseDTO;
 import com.Gachi_Gaja.server.service.PlanService;
-import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.context.SecurityContextHolder;
 
 import java.util.UUID;
 
@@ -17,12 +17,18 @@ public class PlanController {
 
     private final PlanService planService;
 
+    // JWT 기반 userId 추출 메서드
+    private UUID getUserId() {
+        return (UUID) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+    }
+
     /*
     여행 계획 생성 메서드
      */
     @PostMapping("/api/groups/{groupId}/plans")
-    public ResponseEntity<?> generatePlan(@PathVariable UUID groupId, HttpSession session) {
-        UUID userId = (UUID) session.getAttribute("userId");
+    public ResponseEntity<?> generatePlan(@PathVariable UUID groupId) {
+        UUID userId = getUserId();
 
         planService.generatePlan(groupId, userId);
 
@@ -43,8 +49,8 @@ public class PlanController {
     여행 계획 수정 메서드
     */
     @PutMapping("/api/groups/{groupId}/plans/{planId}")
-    public ResponseEntity<String> updatePlan(@Validated @RequestBody PlanRequestDTO request, @PathVariable UUID groupId, UUID planId, HttpSession session) {
-        UUID userId = (UUID) session.getAttribute("userId");
+    public ResponseEntity<String> updatePlan(@Validated @RequestBody PlanRequestDTO request, @PathVariable UUID groupId, UUID planId) {
+        UUID userId = getUserId();
 
         planService.update(groupId, planId, userId, request);
 
@@ -55,8 +61,8 @@ public class PlanController {
     여행 계획 삭제 메서드
      */
     @DeleteMapping("/api/groups/{groupId}/plans/{planId}")
-    public ResponseEntity<String> deletePlan(@PathVariable UUID groupId, UUID planId, HttpSession session) {
-        UUID userId = (UUID) session.getAttribute("userId");
+    public ResponseEntity<String> deletePlan(@PathVariable UUID groupId, UUID planId) {
+        UUID userId = getUserId();
 
         planService.delete(groupId, planId, userId);
 
@@ -67,8 +73,8 @@ public class PlanController {
     여행 계획 추가 메서드
      */
     @PostMapping("/api/groups/{groupId}/new-plans")
-    public ResponseEntity<String> createPlan(@Validated @RequestBody PlanRequestDTO request, @PathVariable UUID groupId, HttpSession session) {
-        UUID userId = (UUID) session.getAttribute("userId");
+    public ResponseEntity<String> createPlan(@Validated @RequestBody PlanRequestDTO request, @PathVariable UUID groupId) {
+        UUID userId = getUserId();
 
         planService.add(groupId, userId, request);
 

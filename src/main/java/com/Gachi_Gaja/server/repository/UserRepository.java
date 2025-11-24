@@ -1,4 +1,4 @@
-// com.Gachi_Gaja.server.repository.UserRepository
+// repository.com.gachi_gaja.server.UserRepository
 package com.Gachi_Gaja.server.repository;
 
 import com.Gachi_Gaja.server.domain.User;

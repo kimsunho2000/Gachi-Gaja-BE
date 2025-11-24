@@ -7,6 +7,7 @@ import com.Gachi_Gaja.server.dto.response.GroupResponseDTO;
 import com.Gachi_Gaja.server.service.GroupService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -22,11 +23,18 @@ public class GroupController {
 
     private final GroupService groupService;
 
+    // 🔹 JWT에서 userId 추출하는 공통 메서드
+    private UUID getUserIdFromJWT() {
+        return (UUID) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
+    }
+
     /** 1️. 모임 생성 (+리더 등록) */
     @PostMapping
     public ResponseEntity<Map<String, Object>> createGroup(
-            @RequestParam UUID userId, // 임시로 param으로 받기 (나중에 JWT에서 추출)
             @Valid @RequestBody GroupRequestDTO dto) {
+
+        UUID userId = getUserIdFromJWT();  // ★ JWT에서 userId 가져오기
 
         UUID groupId = groupService.createGroup(dto, userId);
 
@@ -39,7 +47,10 @@ public class GroupController {
 
     /** 2. 가입한 모임 전체 조회 */
     @GetMapping
-    public ResponseEntity<GroupListResponseDTO> getGroups(@RequestParam UUID userId) {
+    public ResponseEntity<GroupListResponseDTO> getGroups() {
+
+        UUID userId = getUserIdFromJWT();  // ★ JWT 기반
+
         return ResponseEntity.ok(groupService.getGroupsByUser(userId));
     }
 
@@ -52,8 +63,9 @@ public class GroupController {
     /** 4. 모임 삭제 */
     @DeleteMapping("/{groupId}")
     public ResponseEntity<Map<String, String>> deleteGroup(
-            @PathVariable UUID groupId,
-            @RequestParam UUID userId) {   // userId로 리더 검증
+            @PathVariable UUID groupId) {
+
+        UUID userId = getUserIdFromJWT();  // ★ 리더 검증도 JWT로 수행
 
         groupService.deleteGroup(groupId, userId);
 
@@ -67,8 +79,9 @@ public class GroupController {
     @PutMapping("/{groupId}")
     public ResponseEntity<Map<String, Object>> updateGroup(
             @PathVariable UUID groupId,
-            @RequestParam UUID userId,
             @Valid @RequestBody GroupRequestDTO dto) {
+
+        UUID userId = getUserIdFromJWT();  // ★ JWT 기반
 
         groupService.updateGroup(groupId, userId, dto);
 
@@ -93,8 +106,9 @@ public class GroupController {
     /** 7. 모임 멤버 추가 */
     @PostMapping("/{groupId}/members")
     public ResponseEntity<Map<String, Object>> addMemberToGroup(
-            @PathVariable UUID groupId,
-            @RequestParam UUID userId) {
+            @PathVariable UUID groupId) {
+
+        UUID userId = getUserIdFromJWT();  // ★ JWT 기반
 
         groupService.addMemberToGroup(groupId, userId);
 
