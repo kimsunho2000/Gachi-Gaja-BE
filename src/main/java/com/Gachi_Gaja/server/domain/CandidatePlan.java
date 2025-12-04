@@ -5,6 +5,8 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -30,6 +32,9 @@ public class CandidatePlan {
 
     @Column(nullable = false, name = "is_voted") //
     private boolean isVoted;
+
+    @OneToMany(mappedBy = "candidatePlan", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberVote> memberVotes = new ArrayList<>();
 
     @Builder
     public CandidatePlan(Group group, String planContent, int voteCount, boolean isVoted) {

@@ -126,12 +126,7 @@ public class CandidatePlanService {
         // 여행 계획 후보 생성
         // 기존 여행 계획 후보 삭제
         if (group.getCallCnt() < 3) {
-            // DB 제거
-            delete(group.getCandidatePlans().get(1));
-            delete(group.getCandidatePlans().get(0));
-            // 메모리 제거
-            group.getCandidatePlans().remove(1);
-            group.getCandidatePlans().remove(0);
+            group.getCandidatePlans().clear();
         }
 
         List<String> planContents = geminiService.generateContent(prompt, 2);   // Gemini 호출
@@ -139,8 +134,14 @@ public class CandidatePlanService {
         group.decreaseCallCnt();    // AI 호출 횟수 1 감소
 
         // 여행 계획 후보 저장
-        candidatePlanRepository.save(new CandidatePlan(group, planContents.get(0), 0, false));
-        candidatePlanRepository.save(new CandidatePlan(group, planContents.get(1), 0, false));
+        CandidatePlan cp1 = new CandidatePlan(group, planContents.get(0), 0, false);
+        CandidatePlan cp2 = new CandidatePlan(group, planContents.get(1), 0, false);
+
+        candidatePlanRepository.save(cp1);
+        candidatePlanRepository.save(cp2);
+
+        group.getCandidatePlans().add(cp1);
+        group.getCandidatePlans().add(cp2);
 
         // 투표 기한 설정
         LocalDate deadline = LocalDate.now().plusDays(2);
@@ -178,6 +179,12 @@ public class CandidatePlanService {
      */
     @Transactional
     public void delete(CandidatePlan candidatePlan) {
+        // 소속 Group에서 먼저 제거 (orphanRemoval로 자동 삭제)
+        Group group = candidatePlan.getGroup();
+        if (group != null) {
+            group.getCandidatePlans().remove(candidatePlan);
+        }
+        // 명시적 삭제는 orphanRemoval이 처리하므로 불필요하지만, 안전을 위해 유지
         candidatePlanRepository.delete(candidatePlan);
     }
 
