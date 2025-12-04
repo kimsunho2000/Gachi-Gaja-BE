@@ -93,6 +93,12 @@ public class VoteService {
             // 기존 후보 -1
             CandidatePlan oldPlan = vote.getCandidatePlan();
             oldPlan.updateVoteCount(oldPlan.getVoteCount() - 1);
+
+            // 리더가 기존 투표를 변경하는 경우 기존 후보의 isVoted를 false로
+            if (member.isLeader()) {
+                oldPlan.updateVoted(false);
+            }
+
             candidatePlanRepository.save(oldPlan);
 
             // 기존 vote 엔티티에 새 후보로 교체
@@ -109,6 +115,12 @@ public class VoteService {
 
         // 신규 후보 +1
         newPlan.updateVoteCount(newPlan.getVoteCount() + 1);
+
+        // 리더가 투표한 경우 해당 후보의 isVoted를 true로 설정
+        if (member.isLeader()) {
+            newPlan.updateVoted(true);
+        }
+
         candidatePlanRepository.save(newPlan);
 
         // 변경된 vote 저장

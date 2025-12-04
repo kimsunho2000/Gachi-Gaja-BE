@@ -123,14 +123,22 @@ public class CandidatePlanService {
                 "- 출력 예시에 맞춰 간결히 출력하고 그 외는 출력 X\n" +
                 "- 계획 설명은 해당 계획을 세운 근거를 100자 내외로 작성";
 
-        if (group.getCallCnt() < 3) {   // 기존 여행 계획 후보 삭제
-            delete(group.getCandidatePlans().get(0));
+        // 여행 계획 후보 생성
+        // 기존 여행 계획 후보 삭제
+        if (group.getCallCnt() < 3) {
+            // DB 제거
             delete(group.getCandidatePlans().get(1));
+            delete(group.getCandidatePlans().get(0));
+            // 메모리 제거
+            group.getCandidatePlans().remove(1);
+            group.getCandidatePlans().remove(0);
         }
-        List<String> planContents = geminiService.generateContent(prompt, 2);   // Gemini 호출 및 답변 받기
+
+        List<String> planContents = geminiService.generateContent(prompt, 2);   // Gemini 호출
+
         group.decreaseCallCnt();    // AI 호출 횟수 1 감소
 
-        // 여행 계획 후보 생성 및 저장
+        // 여행 계획 후보 저장
         candidatePlanRepository.save(new CandidatePlan(group, planContents.get(0), 0, false));
         candidatePlanRepository.save(new CandidatePlan(group, planContents.get(1), 0, false));
 

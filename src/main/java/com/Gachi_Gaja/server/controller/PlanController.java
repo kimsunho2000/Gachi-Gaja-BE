@@ -49,7 +49,7 @@ public class PlanController {
     여행 계획 수정 메서드
     */
     @PutMapping("/api/groups/{groupId}/plans/{planId}")
-    public ResponseEntity<String> updatePlan(@Validated @RequestBody PlanRequestDTO request, @PathVariable UUID groupId, UUID planId) {
+    public ResponseEntity<String> updatePlan(@Validated @RequestBody PlanRequestDTO request, @PathVariable UUID groupId,@PathVariable UUID planId) {
         UUID userId = getUserId();
 
         planService.update(groupId, planId, userId, request);
@@ -61,7 +61,7 @@ public class PlanController {
     여행 계획 삭제 메서드
      */
     @DeleteMapping("/api/groups/{groupId}/plans/{planId}")
-    public ResponseEntity<String> deletePlan(@PathVariable UUID groupId, UUID planId) {
+    public ResponseEntity<String> deletePlan(@PathVariable UUID groupId,@PathVariable UUID planId) {
         UUID userId = getUserId();
 
         planService.delete(groupId, planId, userId);

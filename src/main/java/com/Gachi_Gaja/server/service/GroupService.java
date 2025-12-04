@@ -1,7 +1,9 @@
 package com.Gachi_Gaja.server.service;
 
+import com.Gachi_Gaja.server.repository.CandidatePlanRepository;
 import com.Gachi_Gaja.server.repository.GroupRepository;
 import com.Gachi_Gaja.server.repository.MemberRepository;
+import com.Gachi_Gaja.server.repository.PlanRepository;
 import com.Gachi_Gaja.server.repository.UserRepository;
 import com.Gachi_Gaja.server.domain.Group;
 import com.Gachi_Gaja.server.domain.Member;
@@ -29,6 +31,8 @@ public class GroupService {
     private final GroupRepository groupRepository;
     private final MemberRepository memberRepository;
     private final UserRepository userRepository;
+    private final CandidatePlanRepository candidatePlanRepository;
+    private final PlanRepository planRepository;
 
     /** 1. 모임 생성 */
     @Transactional
@@ -40,6 +44,10 @@ public class GroupService {
             throw new IllegalArgumentException("예산은 10,000원 이상이어야 합니다.");
         }
 
+        if (!dto.getStartingDay().isBefore(dto.getEndingDay())) {
+            throw new IllegalArgumentException("시작일은 종료일보다 빨라야 합니다.");
+        }
+
         // 그룹 생성
         Group group = Group.builder()
                 .title(dto.getTitle())
@@ -49,6 +57,8 @@ public class GroupService {
                 .transportation(dto.getTransportation())
                 .period(dto.getPeriod())
                 .budget(dto.getBudget())
+                .startingDay(dto.getStartingDay())
+                .endingDay(dto.getEndingDay())
                 .requirementDeadline(dto.getRDeadline())
                 .voteDeadline(null)
                 .callCnt(3)
@@ -96,6 +106,10 @@ public class GroupService {
     public GroupResponseDTO getGroupById(UUID groupId) {
         Group group = groupRepository.findById(groupId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 그룹이 존재하지 않습니다."));
+
+        boolean hasCandidatePlan = !candidatePlanRepository.findAllByGroup_GroupId(groupId).isEmpty();
+        boolean hasPlan = planRepository.existsByGroup_GroupId(groupId);
+
         return GroupResponseDTO.builder()
                 .title(group.getTitle())
                 .region(group.getRegion())
@@ -106,6 +120,10 @@ public class GroupService {
                 .budget(group.getBudget())
                 .rDeadline(String.valueOf(group.getRequirementDeadline()))
                 .pDeadline(String.valueOf(group.getVoteDeadline()))
+                .startingDay(group.getStartingDay())
+                .endingDay(group.getEndingDay())
+                .hasCandidatePlan(hasCandidatePlan)
+                .hasPlan(hasPlan)
                 .build();
     }
 
@@ -148,20 +166,12 @@ public class GroupService {
             throw new IllegalArgumentException("예산은 10,000원 이상이어야 합니다.");
         }
 
-        // 필드 수정
-        group = Group.builder()
-                .title(dto.getTitle())
-                .region(dto.getRegion())
-                .startingPoint(dto.getStartingPlace())
-                .endingPoint(dto.getEndingPlace())
-                .transportation(dto.getTransportation())
-                .period(dto.getPeriod())
-                .budget(dto.getBudget())
-                .requirementDeadline(dto.getRDeadline())
-                .voteDeadline(null)
-                .build();
+        if (!dto.getStartingDay().isBefore(dto.getEndingDay())) {
+            throw new IllegalArgumentException("시작일은 종료일보다 빨라야 합니다.");
+        }
 
-        groupRepository.save(group);
+        // 영속성 컨텍스트로 수정
+        group.update(dto);
     }
 
     /** 6. 모임 멤버 조회 */

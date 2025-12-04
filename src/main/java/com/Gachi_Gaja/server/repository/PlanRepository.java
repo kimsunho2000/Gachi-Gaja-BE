@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.UUID;
 
 public interface PlanRepository extends JpaRepository<Plan, UUID> {
-
+    boolean existsByGroup_GroupId(UUID groupId);
 }

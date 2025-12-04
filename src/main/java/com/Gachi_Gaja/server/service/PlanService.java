@@ -47,12 +47,22 @@ public class PlanService {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
         Member member = memberRepository.findByGroupAndUser(group, user).orElseThrow(() -> new EntityNotFoundException("멤버를 찾을 수 없습니다."));
 
-        if (member.isLeader() != true)
+        if (!member.isLeader())
             throw new IllegalArgumentException("리더만 여행 계획을 생성할 수 있습니다.");
 
-        // 여행 계획 후보 가져오기
-        CandidatePlan candidatePlan = group.getCandidatePlans().get(0);
-        String candidatePlanContent = candidatePlan.getPlanContent();
+        // 여행 계획 후보 가져오기 및 최적 후보 선택
+        List<CandidatePlan> candidatePlans = group.getCandidatePlans();
+
+        if (candidatePlans == null || candidatePlans.size() < 2) {
+            throw new IllegalStateException("여행 계획 후보가 부족합니다. 최소 2개 필요합니다.");
+        }
+
+        CandidatePlan candidatePlanFirst = candidatePlans.get(0);
+        CandidatePlan candidatePlanSecond = candidatePlans.get(1);
+
+        // 최적 후보 선택 로직: 투표수 > 리더 투표 여부
+        CandidatePlan selectedPlan = selectOptimalCandidatePlan(candidatePlanFirst, candidatePlanSecond);
+        String candidatePlanContent = selectedPlan.getPlanContent();
 
         // 프롬프트 생성
         String prompt = "당신은 여행 정보와 간략한 여행 일정을 바탕으로 최적의 여행 계획을 제시하는 여행 플래너입니다.\n" +
@@ -63,7 +73,7 @@ public class PlanService {
                 "- 시작 장소 : " + group.getStartingPoint() + ", " + "\n"  +
                 "- 종료 장소 : " + group.getEndingPoint() + "\n" +
                 "- 교통 수단 : " + group.getTransportation() + "\n" +
-                "- 여행 기간 : " + group.getPeriod() + "\n" +
+                "- 여행 기간 : " + group.getStartingDay() + "~" + group.getEndingDay() + "\n" +
                 "- 인당 예산: " + group.getBudget() + "\n" +
                 "- 인원 : " + group.getMembers().size() + "\n" +
                 "[여행 일정]\n" + candidatePlanContent + "\n" +
@@ -107,6 +117,24 @@ public class PlanService {
         planRepository.saveAll(plans);
     }
 
+    /**
+     * 두 후보 계획 중 최적의 후보를 선택
+     * 우선순위: 1. 투표수가 더 많은 후보, 2. 동점일 경우 리더가 투표한 후보, 3. 그 외는 첫 번째 후보
+     */
+    private CandidatePlan selectOptimalCandidatePlan(CandidatePlan first, CandidatePlan second) {
+        int firstVoteCount = first.getVoteCount();
+        int secondVoteCount = second.getVoteCount();
+
+        if (firstVoteCount > secondVoteCount) {
+            return first;
+        } else if (firstVoteCount < secondVoteCount) {
+            return second;
+        } else {
+            // 동점일 경우 리더가 투표한 후보 선택
+            return first.isVoted() ? first : second;
+        }
+    }
+
     /*
     여행 계획 전체 조회
      */
@@ -116,15 +144,13 @@ public class PlanService {
 
         List<PlanInfoDTO> planInfos = group.getPlans().stream()
                 .sorted(Comparator.comparing(Plan::getStartingTime))    // 시간순 정렬
-                .map(plan -> PlanInfoDTO.from(plan))
+                .map(PlanInfoDTO::from)
                 .collect(Collectors.toList());
 
-        PlanResponseDTO plans = PlanResponseDTO.builder()
+        return PlanResponseDTO.builder()
                 .isLeader(true)
                 .planList(planInfos)
                 .build();
-
-        return plans;
     }
 
     /*
@@ -139,7 +165,7 @@ public class PlanService {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
         Member member = memberRepository.findByGroupAndUser(group, user).orElseThrow(() -> new EntityNotFoundException("멤버를 찾을 수 없습니다."));
 
-        if (member.isLeader() != true)
+        if (!member.isLeader())
             throw new IllegalArgumentException("리더만 여행 계획을 수정할 수 있습니다.");
 
         // 여행 계획 수정
@@ -159,7 +185,7 @@ public class PlanService {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
         Member member = memberRepository.findByGroupAndUser(group, user).orElseThrow(() -> new EntityNotFoundException("멤버를 찾을 수 없습니다."));
 
-        if (member.isLeader() != true)
+        if (!member.isLeader())
             throw new IllegalArgumentException("리더만 여행 계획을 추가할 수 있습니다.");
 
         // 여행 계획 추가
@@ -178,7 +204,7 @@ public class PlanService {
         User user = userRepository.findById(userId).orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
         Member member = memberRepository.findByGroupAndUser(group, user).orElseThrow(() -> new EntityNotFoundException("멤버를 찾을 수 없습니다."));
 
-        if (member.isLeader() != true)
+        if (!member.isLeader())
             throw new IllegalArgumentException("리더만 여행 계획을 삭제할 수 있습니다.");
 
         // 여행 계획 삭제

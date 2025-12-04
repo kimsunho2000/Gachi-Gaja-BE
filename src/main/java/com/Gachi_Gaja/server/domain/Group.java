@@ -1,5 +1,6 @@
 package com.Gachi_Gaja.server.domain;
 
+import com.Gachi_Gaja.server.dto.request.GroupRequestDTO;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -40,6 +41,12 @@ public class Group {
     @Column(nullable = false)
     private String period;
 
+    @Column(name = "start_day")
+    private LocalDate startingDay;
+
+    @Column(name = "end_day")
+    private LocalDate endingDay;
+
     @Column(nullable = false)
     private int budget;
 
@@ -67,7 +74,7 @@ public class Group {
     @Builder
     public Group(String title, String region, String startingPoint, String endingPoint,
                  String transportation, String period, int budget,
-                 LocalDate requirementDeadline, LocalDate voteDeadline, int callCnt) {
+                 LocalDate requirementDeadline,LocalDate startingDay, LocalDate endingDay, LocalDate voteDeadline, int callCnt) {
         this.title = title;
         this.region = region;
         this.startingPoint = startingPoint;
@@ -76,8 +83,23 @@ public class Group {
         this.period = period;
         this.budget = budget;
         this.requirementDeadline = requirementDeadline;
+        this.startingDay = startingDay;
+        this.endingDay =endingDay;
         this.voteDeadline = voteDeadline;
         this.callCnt = callCnt;
+    }
+
+    public void update(GroupRequestDTO dto) {
+        this.title = dto.getTitle();
+        this.region = dto.getRegion();
+        this.startingPoint = dto.getStartingPlace();
+        this.endingPoint = dto.getEndingPlace();
+        this.startingDay = dto.getStartingDay();
+        this.endingDay = dto.getEndingDay();
+        this.transportation = dto.getTransportation();
+        this.period = dto.getPeriod();
+        this.budget = dto.getBudget();
+        this.requirementDeadline = dto.getRDeadline();
     }
 
     /*

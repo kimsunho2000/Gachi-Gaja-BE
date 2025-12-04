@@ -2,6 +2,7 @@ package com.Gachi_Gaja.server.dto.request;
 
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.FutureOrPresent;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -31,6 +32,12 @@ public class GroupRequestDTO {
 
     @NotBlank
     private String endingPlace;
+
+    @NotNull
+    private LocalDate startingDay;
+
+    @NotNull
+    private LocalDate endingDay;
 
     @NotBlank
     private String transportation;
