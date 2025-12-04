@@ -21,6 +21,9 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
+                // CORS 활성화 (WebConfigure의 설정 사용)
+                .cors(cors -> {})
+
                 .csrf(csrf -> csrf.disable())
 
                 // 세션을 전혀 사용하지 않음 (JWT라 Stateless)
@@ -49,3 +52,4 @@ public class SecurityConfig {
         return http.build();
     }
 }
+
