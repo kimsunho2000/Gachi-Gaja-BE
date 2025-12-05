@@ -5,10 +5,16 @@ import com.Gachi_Gaja.server.jwt.JwtTokenProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
 
 @Configuration
 @RequiredArgsConstructor
@@ -21,8 +27,8 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
         http
-                // CORS 활성화 (WebConfigure의 설정 사용)
-                .cors(cors -> {})
+                // CORS 활성화
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
 
                 .csrf(csrf -> csrf.disable())
 
@@ -37,6 +43,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         // JWT 없이 허용되는 요청들
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                         .requestMatchers("/api/login", "/api/users", "/api/logout").permitAll()
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**",
                                 "/swagger-resources/**", "/webjars/**").permitAll()
@@ -50,6 +57,29 @@ public class SecurityConfig {
                         UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
+    }
+
+    @Bean
+    public CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+
+        configuration.setAllowedOriginPatterns(Arrays.asList(
+                "https://gachi-gaja.vercel.app",
+                "https://*.vercel.app",
+                "http://localhost:*",
+                "null"
+        ));
+
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE","PATCH", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+
+        configuration.setExposedHeaders(Arrays.asList("Authorization"));
+
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 }
 
