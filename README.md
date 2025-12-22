@@ -12,6 +12,10 @@
 
 <br>
 
+## 배포 주소
+```
+https://gachi-gaja.vercel.app
+```
 ## 🛠 Tech Stack
 
 ### Framework & Language
@@ -102,7 +106,13 @@ jwt.secret=YOUR_JWT_SECRET_KEY_AT_LEAST_32_CHARACTERS
 ```
 http://localhost:8080/swagger-ui.html
 ```
-👥 Contributors
+
+### 개발 문서
+프로젝트 진행 이력은 아래의 노션 링크에서 확인하실 수 있습니다.
+```
+https://www.notion.so/263dd887b7b780e49fbfeee3bcececc5
+```
+### 👥 Contributors
 
 김진영(PM,star3960) - DB 설계, AI 연동 및 프롬프트 작성, 여행 계획 기능 구현(CRUD), AI 응답 속도 개선
 
