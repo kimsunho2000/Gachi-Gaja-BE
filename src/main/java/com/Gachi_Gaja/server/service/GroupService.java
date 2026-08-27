@@ -33,6 +33,7 @@ public class GroupService {
     private final UserRepository userRepository;
     private final CandidatePlanRepository candidatePlanRepository;
     private final PlanRepository planRepository;
+    private final InviteService inviteService;
 
     /** 1. 모임 생성 */
     @Transactional
@@ -193,23 +194,22 @@ public class GroupService {
                 .collect(Collectors.toList());
     }
 
-    /** 7. 모임 멤버 추가 */
+    /**
+     * 7. 모임 멤버 추가 (POST /api/groups/{groupId}/members)
+     *
+     * 명세상 "현재 로그인된 사용자를 해당 그룹에 추가" 로, /api/invites/{groupId} 와 동작 주체가 같다.
+     * 참가 규칙(마감일 · 중복 · 정원)은 InviteService 한 곳에만 두고 여기서는 위임만 한다.
+     * 과거에는 이 메서드가 정원 체크도 락도 없이 직접 save 해서,
+     * 이쪽으로 들어오면 정원 5명을 얼마든지 넘길 수 있었다.
+     *
+     * 중복 가입 응답은 명세를 따른다.
+     * MemberAppendRequest 명세: "이미 추가된 User인 경우에는 따로 내부 처리를 하지 않고 마찬가지로 200 띄움"
+     * 그래서 예외를 던지는 joinGroup 이 아니라 결과값을 돌려주는 join 을 호출한다.
+     * (예외를 잡는 방식은 트랜잭션이 rollback-only 로 마킹돼 커밋 시 UnexpectedRollbackException 이 난다)
+     */
     @Transactional
     public void addMemberToGroup(UUID groupId, UUID userId) {
-        Group group = groupRepository.findById(groupId)
-                .orElseThrow(() -> new NoSuchElementException("해당 그룹이 존재하지 않습니다."));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("해당 사용자가 존재하지 않습니다."));
-
-        boolean exists = memberRepository.findByGroupAndUser(group, user).isPresent();
-        if (exists) return;
-
-        Member member = Member.builder()
-                .user(user)
-                .group(group)
-                .isLeader(false)
-                .build();
-
-        memberRepository.save(member);
+        // 중복이면 ALREADY_MEMBER 가 돌아오고, 명세대로 아무 일도 하지 않은 채 200 이 나간다.
+        inviteService.join(userId, groupId);
     }
 }

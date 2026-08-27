@@ -6,6 +6,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.PessimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -130,6 +131,13 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponseDTO> handleConflict(Exception ex) {
         log.warn("409 Conflict: {}", ex.getMessage());
         return build(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    // 409 - 비관적 락 대기 시간 초과(그룹 참가 경합). 서버 결함이 아니라 재시도 가능한 충돌이므로 500 이 아니다.
+    @ExceptionHandler(PessimisticLockingFailureException.class)
+    public ResponseEntity<ErrorResponseDTO> handleLockTimeout(PessimisticLockingFailureException ex) {
+        log.warn("409 LockTimeout: {}", ex.getMessage());
+        return build(HttpStatus.CONFLICT, "요청이 몰려 처리하지 못했습니다. 잠시 후 다시 시도해 주세요.");
     }
 
     // 500 - 그 외 서버 오류
